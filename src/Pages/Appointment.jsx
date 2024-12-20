@@ -1,30 +1,45 @@
-import React, { useState } from 'react'
-import { useParams } from 'react-router-dom'
-import { Calendar, Clock, MessageSquare, Phone, User, Check } from 'lucide-react'
+import React, { useState } from 'react';
+import { useParams } from 'react-router-dom';
+import { Calendar, Clock, MessageSquare, Phone, User, Heart, UserCheck } from 'lucide-react';
+
+import { useDispatch } from 'react-redux';
+import {setPatient} from "../Slicer/PatientSlicer";
+
 
 export default function Appointment() {
-  const { DoctorName } = useParams()
-  const [showSuccess, setShowSuccess] = useState(false)
+  let SelectedDoctor = useParams().DoctorName
+  const dispatch = useDispatch();
+  const [showSuccess, setShowSuccess] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
+    age: '',
+    gender: '',
     phone: '',
-    date: '',
-    time: '',
-    message: ''
-  })
+    appointmentDate: '',
+    appointmentTime: '',
+    query: '',
+    doctorName: SelectedDoctor,
+    isHealthy: true
+  });
 
   const handleSubmit = (e) => {
-    e.preventDefault()
+    e.preventDefault();
     // Here you would typically handle the form submission
-    setShowSuccess(true)
-    setTimeout(() => setShowSuccess(false), 3000)
-  }
+    setShowSuccess(true);
+    setTimeout(() => setShowSuccess(false), 3000);
+  };
 
   const handleChange = (e) => {
+    const value = e.target.type === 'checkbox' ? e.target.checked : e.target.value;
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value
-    })
+      [e.target.name]: value
+    });
+  };
+
+  function saveData() {
+    console.log(formData);
+    dispatch(setPatient(formData));
   }
 
   return (
@@ -32,7 +47,7 @@ export default function Appointment() {
       {/* Header Section */}
       <div className="bg-white rounded-xl shadow-md p-8 mb-8">
         <h1 className="text-3xl font-bold text-blue-800 mb-3">Book Appointment</h1>
-        <p className="text-xl text-gray-600">Welcome to {DoctorName}'s Clinic!</p>
+        <p className="text-xl text-gray-600">Welcome to our {SelectedDoctor} Clinic!</p>
       </div>
 
       {/* Form Section */}
@@ -55,6 +70,43 @@ export default function Appointment() {
             />
           </div>
 
+          {/* Age and Gender Fields */}
+          <div className="grid grid-cols-2 gap-6 mb-6">
+            <div>
+              <label className="flex items-center text-gray-700 font-medium mb-2">
+                <UserCheck className="w-5 h-5 mr-2 text-blue-500" />
+                Age
+              </label>
+              <input
+                type="text"
+                name="age"
+                value={formData.age}
+                onChange={handleChange}
+                className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
+                placeholder="Enter your age"
+                required
+              />
+            </div>
+            <div>
+              <label className="flex items-center text-gray-700 font-medium mb-2">
+                <User className="w-5 h-5 mr-2 text-blue-500" />
+                Gender
+              </label>
+              <select
+                name="gender"
+                value={formData.gender}
+                onChange={handleChange}
+                className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
+                required
+              >
+                <option value="">Select Gender</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+          </div>
+
           {/* Phone Field */}
           <div className="mb-6">
             <label className="flex items-center text-gray-700 font-medium mb-2">
@@ -72,17 +124,34 @@ export default function Appointment() {
             />
           </div>
 
+          {/* Doctor Name Field */}
+          <div className="mb-6">
+            <label className="flex items-center text-gray-700 font-medium mb-2">
+              <User className="w-5 h-5 mr-2 text-blue-500" />
+              Doctor Name
+            </label>
+            <input
+              type="text"
+              name="doctorName"
+              value={formData.doctorName}
+              onChange={handleChange}
+              className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
+              placeholder="Enter doctor's name"
+              required
+            />
+          </div>
+
           {/* Date and Time Fields */}
           <div className="grid grid-cols-2 gap-6 mb-6">
             <div>
               <label className="flex items-center text-gray-700 font-medium mb-2">
                 <Calendar className="w-5 h-5 mr-2 text-blue-500" />
-                Preferred Date
+                Appointment Date
               </label>
               <input
                 type="date"
-                name="date"
-                value={formData.date}
+                name="appointmentDate"
+                value={formData.appointmentDate}
                 onChange={handleChange}
                 className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
                 required
@@ -91,12 +160,12 @@ export default function Appointment() {
             <div>
               <label className="flex items-center text-gray-700 font-medium mb-2">
                 <Clock className="w-5 h-5 mr-2 text-blue-500" />
-                Preferred Time
+                Appointment Time
               </label>
               <input
                 type="time"
-                name="time"
-                value={formData.time}
+                name="appointmentTime"
+                value={formData.appointmentTime}
                 onChange={handleChange}
                 className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
                 required
@@ -104,24 +173,40 @@ export default function Appointment() {
             </div>
           </div>
 
-          {/* Message Field */}
+          {/* Health Status Field */}
+          <div className="mb-6">
+            <label className="flex items-center text-gray-700 font-medium mb-2 cursor-pointer">
+              <Heart className="w-5 h-5 mr-2 text-blue-500" />
+              <input
+                type="checkbox"
+                name="isHealthy"
+                checked={formData.isHealthy}
+                onChange={handleChange}
+                className="mr-2"
+              />
+              I am currently healthy with no major health concerns
+            </label>
+          </div>
+
+          {/* Query Field */}
           <div className="mb-6">
             <label className="flex items-center text-gray-700 font-medium mb-2">
               <MessageSquare className="w-5 h-5 mr-2 text-blue-500" />
-              Additional Notes
+              Health Concerns
             </label>
             <textarea
-              name="message"
-              value={formData.message}
+              name="query"
+              value={formData.query}
               onChange={handleChange}
               className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition h-32 resize-none"
-              placeholder="Any specific concerns or information you'd like to share?"
+              placeholder="Please describe your health concerns or reason for visit"
               required
             ></textarea>
           </div>
 
           {/* Submit Button */}
           <button
+            onClick={saveData}
             type="submit"
             className="w-full bg-blue-600 text-white py-4 rounded-lg hover:bg-blue-700 transition font-medium text-lg flex items-center justify-center space-x-2"
           >
@@ -139,5 +224,5 @@ export default function Appointment() {
         )}
       </div>
     </div>
-  )
+  );
 }
