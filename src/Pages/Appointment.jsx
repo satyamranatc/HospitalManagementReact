@@ -5,6 +5,7 @@ import { Calendar, Clock, MessageSquare, Phone, User, Heart, UserCheck } from 'l
 import { useDispatch } from 'react-redux';
 import {setPatient} from "../Slicer/PatientSlicer";
 
+import { Check } from 'lucide-react';  // Add this import at the top
 
 export default function Appointment() {
   let SelectedDoctor = useParams().DoctorName

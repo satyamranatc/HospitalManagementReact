@@ -43,7 +43,6 @@ let PatientSlicer = createSlice({
     initialState: PatientData,
     reducers: {
         setPatient(state, action) {
-            console.log(action.payload);
             state.push(action.payload);
 
         },
