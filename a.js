@@ -1,1 +1,0 @@
-let [DoctorsList,setDoctorsList] = useState()

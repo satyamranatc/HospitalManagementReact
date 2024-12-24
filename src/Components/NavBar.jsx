@@ -1,4 +1,6 @@
 import React, { useState } from 'react'
+import Popup from 'reactjs-popup'
+import AskAi from "../Utils/AskAi.js"
 import { 
   Home as HomeIcon, 
   Calendar, 
@@ -6,12 +8,21 @@ import {
   Users, 
   MessageCircle, 
   HelpCircle, 
-  User2 
+  User2,
+  Send
 } from 'lucide-react'
 
-// Components
 const NavBar = () => {
   const [searchQuery, setSearchQuery] = useState('')
+  const [AiRes, setAiRes] = useState('')
+
+  async function SearchAi(e) {
+    e.preventDefault();
+    let AiQuery = e.target[0].value;
+    let Res = await AskAi(AiQuery);
+    console.log(Res);
+    setAiRes(Res);
+  }
 
   return (
     <nav className="sticky top-0 left-0 right-0 bg-white shadow-md z-50 flex items-center justify-between px-6 py-3">
@@ -43,10 +54,46 @@ const NavBar = () => {
             <HelpCircle className="w-6 h-6" />
             <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">3</span>
           </button>
-          <button className="text-gray-600 hover:text-blue-600 relative">
-            <MessageCircle className="w-6 h-6" />
-            <span className="absolute -top-1 -right-1 bg-green-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">2</span>
-          </button>
+          <Popup 
+            position="bottom right" 
+            trigger={
+              <button className="text-gray-600 hover:text-blue-600 relative">
+                <MessageCircle className="w-6 h-6" />
+                <span className="absolute -top-1 -right-1 bg-green-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">2</span>
+              </button>
+            }
+          >
+            <div className="bg-white rounded-lg shadow-xl w-96 p-4">
+              <div className="mb-4">
+                <h3 className="text-lg font-semibold text-gray-800 mb-2">Ask AI Assistant</h3>
+                <p className="text-sm text-gray-600">Get quick answers to your medical queries</p>
+              </div>
+              
+              <form onSubmit={SearchAi} className="space-y-4">
+                <div className="relative">
+                  <input 
+                    type="text" 
+                    placeholder="What would you like to know?" 
+                    className="w-full px-4 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                  <button 
+                    type="submit" 
+                    className="absolute right-2 top-1/2 -translate-y-1/2 bg-blue-600 text-white p-2 rounded-full hover:bg-blue-700 transition-colors"
+                  >
+                    <Send className="w-4 h-4" />
+                  </button>
+                </div>
+              </form>
+              
+              {AiRes && (
+                <div className="mt-4 p-4 bg-gray-50 rounded-lg">
+                  <div className="text-sm text-gray-800 leading-relaxed">
+                    {AiRes}
+                  </div>
+                </div>
+              )}
+            </div>
+          </Popup>
         </div>
         
         <div className="border-l pl-4">
@@ -59,6 +106,5 @@ const NavBar = () => {
     </nav>
   )
 }
-
 
 export default NavBar
